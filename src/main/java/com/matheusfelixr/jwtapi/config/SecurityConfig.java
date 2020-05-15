@@ -14,7 +14,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.session.SessionManagementFilter;
 
+import com.matheusfelixr.jwtapi.filter.CorsFilter;
 import com.matheusfelixr.jwtapi.filter.JwtRequestFilter;
 import com.matheusfelixr.jwtapi.security.JwtAuthenticationEntryPoint;
 
@@ -41,10 +43,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		
-		httpSecurity.csrf().disable()
+		httpSecurity.addFilterBefore(corsFilter(), SessionManagementFilter.class).csrf().disable()
 		// Não verifique essas requisições
 		.authorizeRequests().antMatchers("/authenticate/**",
 										 "/unauthenticated-route/**",
+										 "/user/create**",
 										 "/v2/api-docs",
 										 "/configuration/ui",
 										 "/swagger-resources/**",
@@ -67,4 +70,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
+	
+    public CorsFilter corsFilter() {
+        CorsFilter filter = new CorsFilter();
+        return filter;
+    }
 }

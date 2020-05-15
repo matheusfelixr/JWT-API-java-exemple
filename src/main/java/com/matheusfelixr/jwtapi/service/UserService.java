@@ -1,10 +1,6 @@
 package com.matheusfelixr.jwtapi.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
+import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,8 +19,12 @@ public class UserService {
 	
 	
     public User create(User user) {
+    	User userRes = userRepository.findByusername(user.getUsername());
+    	if(userRes!=null) {
+    		throw new ServiceException("Usuario ja existente");
+    	}
+
     	user.setPassword(this.passwordEncoder.encode(user.getPassword()));
-    	
 		return userRepository.save(user);
     }
     
